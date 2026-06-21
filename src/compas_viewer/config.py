@@ -250,7 +250,7 @@ class SidebarConfig(ConfigBase):
                 "type": "Sceneform",
                 "columns": [
                     {"title": "Name", "type": "label", "text": lambda obj: obj.name},
-                    {"title": "Show", "type": "checkbox", "checked": lambda obj: obj.show, "action": lambda obj, checked: setattr(obj, "show", checked)},
+                    {"title": "Show", "type": "checkbox", "checked": lambda obj: obj.show, "action": lambda obj, checked: obj.set_visible(checked)},
                 ],
             },
             {"type": "ObjectSetting"},

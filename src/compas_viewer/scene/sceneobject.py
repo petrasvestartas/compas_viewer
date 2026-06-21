@@ -218,3 +218,31 @@ class ViewerSceneObject(SceneObject, Base):
     @property
     def buffer_manager(self):
         return self.viewer.renderer.buffer_manager
+
+    def set_visible(self, show, include_children=True):
+        """Show or hide this object (and, by default, all its descendants).
+
+        Group objects are not uploaded to the GL buffers, so toggling a group's
+        ``show`` flag alone never reaches its children. This walks the subtree,
+        sets ``show`` on every node and pushes only the changed visibility flags
+        to the GPU via ``buffer_manager.update_object_settings`` (a cheap
+        per-object texture write) instead of rebuilding all buffers.
+
+        Parameters
+        ----------
+        show : bool
+            Target visibility.
+        include_children : bool, optional
+            If True (default), cascade to all descendants.
+        """
+        buffer_manager = self.buffer_manager
+        stack = [self]
+        while stack:
+            obj = stack.pop()
+            obj.show = show
+            # No-op for objects not in the buffers (e.g. Group); updates the
+            # show flag in place for buffered geometry.
+            buffer_manager.update_object_settings(obj)
+            if include_children:
+                stack.extend(list(obj.children))
+        self.viewer.renderer.update()

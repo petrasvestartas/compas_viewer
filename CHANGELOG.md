@@ -9,7 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `ViewerSceneObject.set_visible(show, include_children=True)` - toggle an object's visibility and (by default) cascade to all descendants, pushing only the changed `show` flags to the GPU via `buffer_manager.update_object_settings` (no full buffer rebuild). Makes hiding/showing a group instant and actually hide its children (Group objects are not buffered, so a group's `show` flag never reached its children before).
+
 ### Changed
+
+- Sidebar "Show" checkbox now calls `obj.set_visible(checked)`, so toggling a group hides/shows its whole subtree (previously only the clicked node's `show` was set, which had no visible effect for Group rows).
+- `Sceneform.update(refresh=True)` now blocks the tree widget's signals while it clears and rebuilds the items. The rebuild emitted `itemSelectionChanged`/`itemChanged` which fired the selection/checkbox callbacks on the nodes being torn down (or a half-built tree) and could crash the renderer when the scene was swapped/reloaded.
 
 ### Removed
 
